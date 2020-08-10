@@ -17,7 +17,6 @@ PATTERN="sp0"
 #https://stackoverflow.com/questions/40989842/how-to-display-different-messages-on-whiptail-progress-bar-along-with-progress-b/40995466#40995466
 
 function setting_menu {
-  echo "Made it here!"
   PATTERN=$(whiptail --title "Settings" --radiolist "Choose a wipe pattern (press space to select):" \
   $LINES $((COLUMNS-4)) $(($LINES - 8)) \
   "sp0" "2-pass 0/verify " OFF \
@@ -25,7 +24,7 @@ function setting_menu {
   "dod" "[RECOMMENDED] 4-pass r/0/ff/verify " ON \
   "nnsa" "4-pass r/r/0/verify " OFF \
   "bsi" "9-pass ff/fe/fd/fb/f7/ef/df/bf/7f + verify " OFF \
-  3>&1 1>&2 2>&3) && echo $PATTERN && main_menu
+  3>&1 1>&2 2>&3) && main_menu
 }
 
 function main_menu {
