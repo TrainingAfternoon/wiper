@@ -21,6 +21,49 @@ PATTERN="sp0"
 #display different phase messages
 #https://stackoverflow.com/questions/40989842/how-to-display-different-messages-on-whiptail-progress-bar-along-with-progress-b/40995466#40995466
 
+function wipe_menu {
+  DRIVE_ARRAY=($(lsblk -pld -o NAME,SIZE -e7 | grep "sd*"))
+  DRIVE=$(whiptail --title "Wiper "$VERSION --menu "Choose a drive to wipe:" \
+  $LINES $COLUMNS $((LINES - 8)) "${ARR[@]/#/     }" 3>&1 1>&2 2>&1)
+  #TODO: Might be able to merge the preceding whitespace trim into above?
+
+  #Parameter expansion here removes the preceding whitespaces added in the ui
+  wipe "${$DRIVE// /}"
+}
+
+function wipe {
+  #TODO: Add verification functionality
+  #Match last word of OP to a table with key/val between string and fp?
+  case $PATTERN in
+    "sp0")
+      OP="Writing zeroes"
+    ;;
+    "spff")
+      OP="Writing 0xff"
+    ;;
+    "dod")
+      OP=("Writing random" "Writing zeroes" "Writing 0xff")
+    ;;
+    "nnsa")
+      OP=("Writing random" "Writing random" "Writing zeroes")
+    ;;
+    "bsi")
+      OP=("Writing 0xff" "Writing 0xfe" "Writing 0xfd" "Writing 0xfb" \
+      "Writing 0xf7" "Writing 0xef" "Writing 0xdf" "Writing 0xbf" \
+      "Writing 0x7f")
+    ;;
+
+    for i in "${$OP[@]}"
+    do
+      pv -n /dev/zero | dd of=$1 | whiptail --title "Wiping "$1 \
+      --gauge "dd: Dunkin' Drives since 2020"'\n'$i 6 50 0
+    done
+
+    whiptail --title "Wiper "$VERSION --msgbox "Erasure of "$1 \
+    " complete! Hit okay to return to the main menu" $LINES $(($COLUMNS/4)) \
+    && main_menu
+}
+
 function setting_menu {
   PATTERN=$(whiptail --title "Settings" --radiolist "Choose a wipe pattern (press space to select):" \
   $LINES $((COLUMNS-4)) $(($LINES - 8)) \
