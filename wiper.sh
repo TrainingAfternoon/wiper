@@ -7,12 +7,17 @@ COLUMNS=$(tput cols)
 PATTERN="sp0"
 
 #need to get output from lsblk -pld -o NAME,SIZE -e7
-#DUMP=$(lsblk -pld -o NAME,SIZE -e7 | grep "sd*") works for variable-ifying
+#readarray -t ARR < <(lsblk -pld -o NAME,SIZE -e7 | grep "sd*")
+#Need a way to read an array dynamically into a whiptail menu
+#Okay so the issue we're having with simply passing the array to whiptail
+#is: tags. Whiptail menu is interpreting sda + sdb as an item/tag combo
+#Raw grep output is /dev/sda xxG /dev/sdb xxG /dev/sdc xxG
+#Need a way to delimit this output
 
 #progress bar for dd can be created with:
 #https://www.cyberciti.biz/faq/linux-unix-dd-command-show-progress-while-coping/
 #pv -n /dev/urandom | dd of=$TARGET_DISK bs=$BS | whiptail \
-#--title "Wiping "$TARGET_DISK --gauge "dd: Dunkin' hDds" 6 50 0
+#--title "Wiping "$TARGET_DISK --gauge "dd: Dunkin' hDds since 2020" 6 50 0
 #display different phase messages
 #https://stackoverflow.com/questions/40989842/how-to-display-different-messages-on-whiptail-progress-bar-along-with-progress-b/40995466#40995466
 
