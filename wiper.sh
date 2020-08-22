@@ -5,14 +5,13 @@ COLUMNS=$(tput cols)
 
 #Global Variables
 PATTERN="sp0"
+#Psuedo K/V pairings because b3 doesn't have associative arrays :)
+zeroes="/dev/zero"
+random="/dev/urandom"
 
 #need to get output from lsblk -pld -o NAME,SIZE -e7
 #readarray -t ARR < <(lsblk -pld -o NAME,SIZE -e7 | grep "sd*")
-#Need a way to read an array dynamically into a whiptail menu
-#Okay so the issue we're having with simply passing the array to whiptail
-#is: tags. Whiptail menu is interpreting sda + sdb as an item/tag combo
 #Raw grep output is /dev/sda xxG /dev/sdb xxG /dev/sdc xxG
-#Need a way to delimit this output
 
 #progress bar for dd can be created with:
 #https://www.cyberciti.biz/faq/linux-unix-dd-command-show-progress-while-coping/
@@ -25,10 +24,10 @@ function wipe_menu {
   DRIVE_ARRAY=($(lsblk -pld -o NAME,SIZE -e7 | grep "sd*"))
   DRIVE=$(whiptail --title "Wiper "$VERSION --menu "Choose a drive to wipe:" \
   $LINES $COLUMNS $((LINES - 8)) "${ARR[@]/#/     }" 3>&1 1>&2 2>&1)
-  #TODO: Might be able to merge the preceding whitespace trim into above?
+  #Parameter expansion here adds padding to make ui more friendly
 
   #Parameter expansion here removes the preceding whitespaces added in the ui
-  wipe "${$DRIVE// /}"
+  #wipe "${$DRIVE// /}"
 }
 
 function wipe {
@@ -52,12 +51,18 @@ function wipe {
       "Writing 0xf7" "Writing 0xef" "Writing 0xdf" "Writing 0xbf" \
       "Writing 0x7f")
     ;;
+  esac
 
-    for i in "${$OP[@]}"
+  for i in "${$OP[@]}"
     do
-      pv -n /dev/zero | dd of=$1 | whiptail --title "Wiping "$1 \
+      #Read will chunk the OP string into two, with the second substring
+      #being what we want, namely what is being written. disregard is disregarded
+      read disregard WRIEFROM <<< "${OP[$i]}"#does this work?
+      pv -n $WRITEFROM | dd of=$1 | whiptail --title "Wiping "$1 \
       --gauge "dd: Dunkin' Drives since 2020"'\n'$i 6 50 0
     done
+
+    #TODO: Verify pass here
 
     whiptail --title "Wiper "$VERSION --msgbox "Erasure of "$1 \
     " complete! Hit okay to return to the main menu" $LINES $(($COLUMNS/4)) \
