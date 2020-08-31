@@ -57,7 +57,7 @@ function wipe {
     do
       #Read will chunk the OP string into two, with the second substring
       #being what we want, namely what is being written. disregard is disregarded
-      read disregard WRIEFROM <<< "${OP[$i]}"#does this work?
+      read disregard WRITEFROM <<< "${OP[$i]}"#does this work?
       pv -n $WRITEFROM | dd of=$1 | whiptail --title "Wiping "$1 \
       --gauge "dd: Dunkin' Drives since 2020"'\n'$i 6 50 0
     done
