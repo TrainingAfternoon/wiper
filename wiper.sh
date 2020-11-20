@@ -24,11 +24,11 @@ random="/dev/urandom"
 function wipe_menu {
   DRIVE_ARRAY=($(lsblk -pld -o NAME,SIZE -e7 | grep "sd*"))
   DRIVE=$(whiptail --title "Wiper "$VERSION --menu "Choose a drive to wipe:" \
-  $LINES $COLUMNS $(expr $LINES - 8) "${ARR[@]/#/     }" 3>&1 1>&2 2>&1)
+  $LINES $COLUMNS $(expr $LINES - 8) "${DRIVE_ARRAY[@]/#/     }" 3>&1 1>&2 2>&1)
   #Parameter expansion here adds padding to make ui more friendly
 
   #Parameter expansion here removes the preceding whitespaces added in the ui
-  wipe "${$DRIVE// /}"
+  wipe "${DRIVE:4}"
 }
 
 function wipe {
@@ -50,7 +50,7 @@ function wipe {
     ;;
   esac
   
-  scrub $SAFETY $OP $1 && whiptail --msgbox $1" scrubbed" $LINES $COLUMNS && main_menu
+  scrub $SAFETY $OP $0 && whiptail --msgbox $0" scrubbed" $LINES $COLUMNS && main_menu
 }
 
 #TODO: Implement homebrew wiping with dd
