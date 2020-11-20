@@ -2,6 +2,7 @@
 VERSION="v1.0"
 LINES=$(tput lines)
 COLUMNS=$(tput cols)
+SAFETY="-n"
 
 #Global Variables
 PATTERN="sp0"
@@ -27,10 +28,33 @@ function wipe_menu {
   #Parameter expansion here adds padding to make ui more friendly
 
   #Parameter expansion here removes the preceding whitespaces added in the ui
-  #wipe "${$DRIVE// /}"
+  wipe "${$DRIVE// /}"
 }
 
 function wipe {
+ case $PATTERN in
+    "sp0")
+      OP="-p fillzero"
+    ;;
+    "spff")
+      OP="-p fillff"
+    ;;
+    "dod")
+      OP="-p dod"
+    ;;
+    "nnsa")
+      OP="-p nnsa"
+    ;;
+    "bsi")
+      OP="-p bsi"
+    ;;
+  esac
+  
+  scrub $SAFETY $OP $1 && whiptail --msgbox $1" scrubbed" $LINES $COLUMNS && main_menu
+}
+
+#TODO: Implement homebrew wiping with dd
+function experimental_wipe {
   #TODO: Add verification functionality
   #Match last word of OP to a table with key/val between string and fp?
   case $PATTERN in
@@ -91,6 +115,7 @@ function main_menu {
 
   case $MENOPT in
     "Wipe")
+      wipe_menu
       echo "Wiped"
     ;;
     "Settings")
