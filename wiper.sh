@@ -24,7 +24,7 @@ random="/dev/urandom"
 function wipe_menu {
   DRIVE_ARRAY=($(lsblk -pld -o NAME,SIZE -e7 | grep "sd*"))
   DRIVE=$(whiptail --title "Wiper "$VERSION --menu "Choose a drive to wipe:" \
-  $LINES $COLUMNS $((LINES - 8)) "${ARR[@]/#/     }" 3>&1 1>&2 2>&1)
+  $LINES $COLUMNS $(expr $LINES - 8) "${ARR[@]/#/     }" 3>&1 1>&2 2>&1)
   #Parameter expansion here adds padding to make ui more friendly
 
   #Parameter expansion here removes the preceding whitespaces added in the ui
